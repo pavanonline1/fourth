@@ -1,0 +1,2081 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YummyGo - Order Your Favorite Food</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #ff6b00;
+            --secondary-color: #e63946;
+            --dark-color: #1a1a1a;
+            --light-color: #f8f9fa;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --info-color: #17a2b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: var(--dark-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .logo span {
+            color: white;
+        }
+
+        .cart-icon {
+            position: relative;
+            cursor: pointer;
+            font-size: 22px;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: var(--secondary-color);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+        }
+
+        .restaurant-header {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .restaurant-image {
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            object-fit: cover;
+            margin-right: 20px;
+        }
+
+        .restaurant-info h2 {
+            color: var(--dark-color);
+            margin-bottom: 5px;
+        }
+
+        .restaurant-info p {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .rating {
+            display: flex;
+            align-items: center;
+            color: var(--warning-color);
+            font-weight: bold;
+        }
+
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .filter-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 20px;
+            background-color: white;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .filter-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .filter-btn:hover {
+            background-color: #ff8c42;
+            color: white;
+        }
+
+        .filter-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--secondary-color);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 10px;
+        }
+
+        .section-title {
+            margin: 25px 0 15px;
+            color: var(--dark-color);
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .top-picks-container {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .top-picks {
+            display: flex;
+            overflow-x: auto;
+            gap: 20px;
+            padding: 10px 0;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+
+        .top-picks::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+        .top-pick-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+            flex: 0 0 280px;
+            animation: glow 2s infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 5px rgba(255, 107, 0, 0.5);
+            }
+            to {
+                box-shadow: 0 0 20px rgba(255, 107, 0, 0.8);
+            }
+        }
+
+        .top-pick-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .top-pick-card::after {
+            content: "TRENDING";
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .menu-category {
+            margin-bottom: 30px;
+        }
+
+        .category-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .menu-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .food-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .food-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .food-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .food-details {
+            padding: 15px;
+        }
+
+        .food-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--dark-color);
+        }
+
+        .food-description {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .food-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .food-price {
+            font-weight: bold;
+            color: var(--primary-color);
+            font-size: 18px;
+        }
+
+        .food-price .original-price {
+            text-decoration: line-through;
+            color: #999;
+            font-size: 14px;
+            margin-right: 5px;
+        }
+
+        .food-rating {
+            display: flex;
+            align-items: center;
+            color: var(--warning-color);
+            font-weight: 500;
+        }
+
+        .food-rating i {
+            margin-right: 5px;
+        }
+
+        .add-to-cart {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .add-to-cart:hover {
+            background-color: #e05a00;
+        }
+
+        .offers-section {
+            margin: 20px 0;
+        }
+
+        .offers-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--dark-color);
+        }
+
+        .offers-container {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding: 10px 0;
+            scrollbar-width: none;
+        }
+
+        .offers-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .offer-card {
+            flex: 0 0 200px;
+            background: linear-gradient(135deg, #ff6b00, #ff8c42);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .offer-card:hover {
+            transform: scale(1.03);
+        }
+
+        .offer-card h4 {
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+
+        .offer-card p {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 20px;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .modal-food-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .modal-food-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--dark-color);
+        }
+
+        .modal-food-rating {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .modal-food-rating .rating-value {
+            font-weight: bold;
+            margin-right: 10px;
+            color: var(--warning-color);
+        }
+
+        .modal-food-rating .reviews {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .modal-food-price {
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .modal-food-price .original-price {
+            text-decoration: line-through;
+            color: #999;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+
+        .modal-food-description {
+            color: #444;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .special-instructions {
+            margin-bottom: 20px;
+        }
+
+        .special-instructions h4 {
+            margin-bottom: 10px;
+            color: var(--dark-color);
+        }
+
+        .instructions-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .buzz-words {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .buzz-word {
+            background-color: #f0f0f0;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .buzz-word:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        .quantity-btn {
+            width: 30px;
+            height: 30px;
+            background-color: #f0f0f0;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .quantity-value {
+            margin: 0 15px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .modal-add-to-cart {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 12px 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+            width: 100%;
+            font-size: 16px;
+        }
+
+        .modal-add-to-cart:hover {
+            background-color: #e05a00;
+        }
+
+        .cart-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: flex-end;
+        }
+
+        .cart-content {
+            background-color: white;
+            width: 100%;
+            max-width: 400px;
+            height: 100%;
+            padding: 20px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .cart-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .close-cart {
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .cart-items {
+            margin-bottom: 20px;
+        }
+
+        .cart-item {
+            display: flex;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .cart-item-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-right: 15px;
+        }
+
+        .cart-item-details {
+            flex: 1;
+        }
+
+        .cart-item-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .cart-item-price {
+            color: var(--primary-color);
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .cart-item-instructions {
+            color: #666;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .cart-item-quantity {
+            display: flex;
+            align-items: center;
+        }
+
+        .cart-quantity-btn {
+            width: 25px;
+            height: 25px;
+            background-color: #f0f0f0;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .cart-quantity-value {
+            margin: 0 10px;
+        }
+
+        .remove-item {
+            color: var(--secondary-color);
+            font-size: 12px;
+            cursor: pointer;
+            margin-top: 5px;
+            display: inline-block;
+        }
+
+        .coupon-section {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .coupon-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .coupon-input {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .coupon-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px 0 0 4px;
+            outline: none;
+        }
+
+        .coupon-input button {
+            padding: 10px 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+
+        .coupon-message {
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .coupon-message.success {
+            color: var(--success-color);
+        }
+
+        .coupon-message.error {
+            color: var(--secondary-color);
+        }
+
+        .cancel-coupon {
+            color: var(--secondary-color);
+            font-size: 12px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .price-details {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .price-total {
+            font-weight: bold;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+        }
+
+        .checkout-btn {
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 12px;
+            width: 100%;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .checkout-btn:hover {
+            background-color: #218838;
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 40px 0;
+            color: #666;
+        }
+
+        .empty-cart i {
+            font-size: 50px;
+            margin-bottom: 15px;
+            color: #ddd;
+        }
+
+        .empty-cart p:first-of-type {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .menu-items {
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            }
+            
+            .cart-content {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .restaurant-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .restaurant-image {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+            
+            .menu-items {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo">Yummy<span>Go</span></div>
+            <div class="cart-icon" id="cartIcon">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-count" id="cartCount">0</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="restaurant-header">
+            <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Restaurant" class="restaurant-image">
+            <div class="restaurant-info">
+                <h2>Spice Heaven</h2>
+                <p>North Indian, Chinese, Mughlai • $$ • 4.2 ★ (1,200+ ratings)</p>
+                <p>30-35 mins • 2.5 km away • Free delivery above ₹149</p>
+            </div>
+        </div>
+
+        <div class="filters">
+            <button class="filter-btn active" data-filter="all">All <span class="filter-count" id="all-count">0</span></button>
+            <button class="filter-btn" data-filter="veg">Pure Veg <span class="filter-count" id="veg-count">0</span></button>
+            <button class="filter-btn" data-filter="non-veg">Non Veg <span class="filter-count" id="non-veg-count">0</span></button>
+            <button class="filter-btn" data-filter="dessert">Desserts <span class="filter-count" id="dessert-count">0</span></button>
+            <button class="filter-btn" data-filter="ice-cream">Ice Creams <span class="filter-count" id="ice-cream-count">0</span></button>
+            <button class="filter-btn" data-filter="milkshake">Milkshakes <span class="filter-count" id="milkshake-count">0</span></button>
+        </div>
+
+        <div class="offers-section">
+            <h3 class="offers-title">Special Offers</h3>
+            <div class="offers-container">
+                <div class="offer-card" data-code="23KB1A0OFF">
+                    <h4>FLAT 20% OFF</h4>
+                    <p>Use code 23KB1A0OFF | Min. order ₹199</p>
+                </div>
+                <div class="offer-card" data-code="23KB1A0HNY">
+                    <h4>₹100 CASHBACK</h4>
+                    <p>Use code 23KB1A0HNY | Max. discount ₹100</p>
+                </div>
+                <div class="offer-card" data-code="23KB1A0FRE">
+                    <h4>FREE DELIVERY</h4>
+                    <p>Use code 23KB1A0FRE | No min. order</p>
+                </div>
+                <div class="offer-card" data-code="23KB1A0BIG">
+                    <h4>FLAT 30% OFF</h4>
+                    <p>Use code 23KB1A0BIG | Min. order ₹499</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="top-picks-container">
+            <h2 class="section-title">Trending Dishes</h2>
+            <div class="top-picks" id="topPicks">
+                <!-- Top picks will be loaded here by JavaScript -->
+            </div>
+        </div>
+
+        <div class="menu-category">
+            <h2 class="category-title">Biryani</h2>
+            <div class="menu-items" id="biryaniItems">
+                <!-- Biryani items will be loaded here by JavaScript -->
+            </div>
+        </div>
+
+        <div class="menu-category">
+            <h2 class="category-title">Starters</h2>
+            <div class="menu-items" id="curryItems">
+                <!-- Curry items will be loaded here by JavaScript -->
+            </div>
+        </div>
+
+        <div class="menu-category">
+            <h2 class="category-title">Rotis</h2>
+            <div class="menu-items" id="breadItems">
+                <!-- Bread items will be loaded here by JavaScript -->
+            </div>
+        </div>
+
+        <div class="menu-category">
+            <h2 class="category-title">Desserts</h2>
+            <div class="menu-items" id="dessertItems">
+                <!-- Dessert items will be loaded here by JavaScript -->
+            </div>
+        </div>
+
+        <div class="menu-category">
+            <h2 class="category-title">Milkshakes & Ice Creams</h2>
+            <div class="menu-items" id="drinkItems">
+                <!-- Drink items will be loaded here by JavaScript -->
+        </div>
+    </div>
+
+    <!-- Food Item Modal -->
+    <div class="modal" id="foodModal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeModal">&times;</span>
+            <img src="" alt="Food Item" class="modal-food-image" id="modalFoodImage">
+            <h2 class="modal-food-title" id="modalFoodTitle"></h2>
+            <div class="modal-food-rating">
+                <span class="rating-value" id="modalFoodRating"></span>
+                <span class="reviews" id="modalFoodReviews"></span>
+            </div>
+            <div class="modal-food-price" id="modalFoodPrice"></div>
+            <p class="modal-food-description" id="modalFoodDescription"></p>
+            
+            <div class="special-instructions">
+                <h4>Special Instructions</h4>
+                <textarea class="instructions-input" id="instructionsInput" placeholder="Any specific preferences? (e.g., no onion, less spicy)"></textarea>
+                <div class="buzz-words">
+                    <div class="buzz-word">Extra Cheese</div>
+                    <div class="buzz-word">Extra Spicy</div>
+                    <div class="buzz-word">Less Spicy</div>
+                    <div class="buzz-word">No Onion</div>
+                    <div class="buzz-word">No Garlic</div>
+                </div>
+            </div>
+            
+            <div class="quantity-control">
+                <button class="quantity-btn" id="decreaseQuantity">-</button>
+                <span class="quantity-value" id="quantityValue">1</span>
+                <button class="quantity-btn" id="increaseQuantity">+</button>
+            </div>
+            
+            <button class="modal-add-to-cart" id="modalAddToCart">Add to Cart</button>
+        </div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div class="cart-modal" id="cartModal">
+        <div class="cart-content">
+            <div class="cart-header">
+                <h2 class="cart-title">Your Cart</h2>
+                <span class="close-cart" id="closeCart">&times;</span>
+            </div>
+            
+            <div class="cart-items" id="cartItems">
+                <!-- Cart items will be loaded here by JavaScript -->
+                <div class="empty-cart">
+                    <i class="fas fa-shopping-basket"></i>
+                    <p>No items added to cart</p>
+                    <p>Add some delicious food to get started!</p>
+                </div>
+            </div>
+            
+            <div class="coupon-section">
+                <h4 class="coupon-title">Apply Coupon</h4>
+                <div class="coupon-input">
+                    <input type="text" id="couponCode" placeholder="Enter coupon code">
+                    <button id="applyCoupon">Apply</button>
+                </div>
+                <p class="coupon-message" id="couponMessage"></p>
+                <p id="appliedCoupon" style="display: none;">
+                    Applied: <span id="appliedCouponCode"></span>
+                    <span class="cancel-coupon" id="cancelCoupon">Cancel</span>
+                </p>
+            </div>
+            
+            <div class="price-details">
+                <h4>Price Details</h4>
+                <div class="price-row">
+                    <span>Subtotal</span>
+                    <span id="subtotal">₹0</span>
+                </div>
+                <div class="price-row">
+                    <span>Delivery Fee</span>
+                    <span id="deliveryFee">₹40</span>
+                </div>
+                <div class="price-row">
+                    <span>Taxes & Charges</span>
+                    <span id="taxes">₹0</span>
+                </div>
+                <div class="price-row" id="discountRow" style="display: none;">
+                    <span>Discount</span>
+                    <span id="discount">-₹0</span>
+                </div>
+                <div class="price-row price-total">
+                    <span>Total</span>
+                    <span id="total">₹40</span>
+                </div>
+            </div>
+            
+            <button class="checkout-btn">Proceed to Checkout</button>
+        </div>
+    </div>
+
+    <script>
+        // Sample data for the restaurant menu
+        const menuData = [
+    // Biryanis
+    {
+        id: 1,
+        title: "Hyderabadi Biryani",
+        description: "Fragrant basmati rice cooked with aromatic spices and tender chicken pieces.",
+        price: 299,
+        originalPrice: 349,
+        rating: 4.7,
+        reviews: 580,
+        image: "https://images.unsplash.com/photo-1631515243349-e0cb75fb8d3a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1488&q=80",
+        category: ["non-veg"],
+        topPick: true,
+        menuCategory: "biryani"
+    },
+    {
+        id: 2,
+        title: "Veg Dum Biryani",
+        description: "Aromatic biryani with mixed vegetables cooked in dum style with fragrant spices.",
+        price: 249,
+        originalPrice: 299,
+        rating: 4.5,
+        reviews: 420,
+        image: "https://tse1.mm.bing.net/th?id=OIP.yh-lYonX_sPwlJA4vNQ6BAHaGL&pid=Api&P=0&h=180",
+        category: ["veg"],
+        topPick: false,
+        menuCategory: "biryani"
+    },
+    {
+        id: 3,
+        title: "Mutton Biryani",
+        description: "Rich and flavorful biryani made with tender mutton pieces and premium basmati rice.",
+        price: 349,
+        originalPrice: 399,
+        rating: 4.8,
+        reviews: 320,
+        image: "https://tse4.mm.bing.net/th?id=OIP.qTzBIim8Nyc4KQofktP11AHaE8&pid=Api&P=0&h=180",
+        category: ["non-veg"],
+        topPick: false,
+        menuCategory: "biryani"
+    },
+    {
+        id: 19,
+        title: "Fish Biryani",
+        description: "Rich and flavorful biryani made with fresh fish pieces and premium basmati rice.",
+        price: 389,
+        originalPrice: 499,
+        rating: 4.6,
+        reviews: 120,
+        image: "https://tse3.mm.bing.net/th?id=OIP.Y9dF150pyuX6gLxA7eZOQwHaEK&pid=Api&P=0&h=180",
+        category: ["non-veg"],
+        topPick: true,
+        menuCategory: "biryani"
+    },
+    {
+        id: 45,
+        title: "Raju gari kodi pulao",
+        description: "Rich and flavorful biryani made with tender kodi pieces and premium rice.",
+        price: 400,
+        originalPrice: 499,
+        rating: 4.9,
+        reviews: 4670,
+        image: "https://mummyrecipes.in/wp-content/uploads/2019/04/rajugaricover-1140x760.jpg",
+        category: ["non-veg"],
+        topPick: true,
+        menuCategory: "biryani"
+    },
+
+    
+    // Curries
+    {
+        id: 4,
+        title: "Butter Chicken",
+        description: "Tender chicken pieces cooked in a rich, creamy tomato-based gravy with butter and aromatic spices.",
+        price: 299,
+        originalPrice: 349,
+        rating: 4.6,
+        reviews: 520,
+        image: "https://images.unsplash.com/photo-1603894584373-5ac82b2e398?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+        category: ["non-veg"],
+        topPick: false,
+        menuCategory: "starters"
+    },
+    {
+        id: 5,
+        title: "Paneer Butter Masala",
+        description: "Soft paneer cubes in a rich, creamy tomato-based gravy with aromatic spices.",
+        price: 269,
+        originalPrice: 299,
+        rating: 4.7,
+        reviews: 480,
+        image: "https://tse3.mm.bing.net/th?id=OIP.h8B8YS1swJQT2Baml4_fsQHaFj&pid=Api&P=0&h=180",
+        category: ["veg"],
+        topPick: true,
+        menuCategory: "starters"
+    },
+    {
+        id: 6,
+        title: "Dal Makhani",
+        description: "Creamy black lentils slow-cooked with butter and spices, a North Indian classic.",
+        price: 199,
+        originalPrice: 249,
+        rating: 4.4,
+        reviews: 320,
+        image: "https://tse4.mm.bing.net/th?id=OIP.giZqQvtTXt3PFYe6G3MG7AHaE8&pid=Api&P=0&h=180",
+        category: ["veg"],
+        topPick: false,
+        menuCategory: "starters"
+    },
+    {
+        id: 7,
+        title: "Chicken Tikka Masala",
+        description: "Juicy chicken tikka pieces in a rich, creamy and mildly spiced gravy.",
+        price: 279,
+        originalPrice: 329,
+        rating: 4.5,
+        reviews: 290,
+        image: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+        category: ["non-veg"],
+        topPick: false,
+        menuCategory: "starters"
+    },
+    
+    // Breads & Rotis
+    {
+        id: 8,
+        title: "Butter Naan",
+        description: "Soft and fluffy leavened bread brushed with butter, cooked in tandoor.",
+        price: 49,
+        originalPrice: 59,
+        rating: 4.2,
+        reviews: 180,
+        image: "https://tse3.mm.bing.net/th?id=OIP.W7guZsN1hVpKlia8abT2iQHaHa&pid=Api&P=0&h=180",
+        category: ["veg"],
+        topPick: false,
+        menuCategory: "starters"
+    },
+    {
+        id: 9,
+        title: "Garlic Naan",
+        description: "Tandoori naan flavored with garlic and coriander, brushed with butter.",
+        price: 59,
+        originalPrice: 69,
+        rating: 4.3,
+        reviews: 210,
+        image: "https://tse4.mm.bing.net/th?id=OIP.DhgB5v6koG3naKrT4pDIMQHaJQ&pid=Api&P=0&h=180",
+        category: ["veg"],
+        topPick: false,
+        menuCategory: "bread"
+    },
+    {
+        id: 10,
+        title: "Tandoori Roti",
+        description: "Whole wheat bread cooked in tandoor, healthy and delicious.",
+        price: 29,
+        originalPrice: 35,
+        rating: 4.1,
+        reviews: 150,
+        image: "https://tse3.mm.bing.net/th?id=OIP.6CQuC0Koi5HdF_-Thny55AHaHa&pid=Api&P=0&h=180",
+        category: ["veg"],
+        topPick: false,
+        menuCategory: "bread"
+    },
+    {
+        id: 11,
+        title: "Lachha Paratha",
+        description: "Flaky, multi-layered whole wheat bread cooked with ghee.",
+        price: 69,
+        originalPrice: 79,
+        rating: 4.4,
+        reviews: 190,
+        image: "https://tse3.mm.bing.net/th?id=OIP.6tu7Mz_K1e1S0kN3brUm8gHaE8&pid=Api&P=0&h=180",
+        category: ["veg"],
+        topPick: true,
+        menuCategory: "bread"
+    },
+    
+    // Desserts
+    {
+        id: 12,
+        title: "Gulab Jamun",
+        description: "Soft, melt-in-mouth khoya balls soaked in sugar syrup.",
+        price: 99,
+        originalPrice: 119,
+        rating: 4.6,
+        reviews: 280,
+        image: "https://images.unsplash.com/photo-1571115177098-24ec42ed204d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80",
+        category: ["veg", "dessert"],
+        topPick: false,
+        menuCategory: "dessert"
+    },
+    {
+        id: 13,
+        title: "Rasmalai",
+        description: "Soft cottage cheese patties soaked in sweetened, thickened milk.",
+        price: 119,
+        originalPrice: 139,
+        rating: 4.7,
+        reviews: 240,
+        image: "https://tse3.mm.bing.net/th?id=OIP.F4Bh16eFLjj2CrORvdjqNwHaHa&pid=Api&P=0&h=180",
+        category: ["veg", "dessert"],
+        topPick: false,
+        menuCategory: "dessert"
+    },
+    {
+        id: 14,
+        title: "Chocolate Lava Cake",
+        description: "Warm chocolate cake with a molten chocolate center, served with vanilla ice cream.",
+        price: 149,
+        originalPrice: 179,
+        rating: 4.8,
+        reviews: 310,
+        image: "https://images.unsplash.com/photo-1495147466023-ac5c588e2e94?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80",
+        category: ["veg", "dessert"],
+        topPick: true,
+        menuCategory: "dessert"
+    },
+    
+    // Milkshakes & Ice Creams
+    {
+        id: 15,
+        title: "Chocolate Milkshake",
+        description: "Creamy milkshake made with rich chocolate syrup and vanilla ice cream.",
+        price: 149,
+        originalPrice: 169,
+        rating: 4.3,
+        reviews: 210,
+        image: "https://images.unsplash.com/photo-1579954115545-a95591f28bfc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+        category: ["veg", "milkshake"],
+        topPick: false,
+        menuCategory: "drink"
+    },
+    {
+        id: 16,
+        title: "Strawberry Milkshake",
+        description: "Refreshing milkshake made with fresh strawberries and vanilla ice cream.",
+        price: 159,
+        originalPrice: 179,
+        rating: 4.2,
+        reviews: 180,
+        image: "https://images.unsplash.com/photo-1551024506-0bccd828d307?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1557&q=80",
+        category: ["veg", "milkshake"],
+        topPick: false,
+        menuCategory: "drink"
+    },
+    {
+        id: 17,
+        title: "Vanilla Ice Cream",
+        description: "Classic vanilla ice cream made with real vanilla beans.",
+        price: 99,
+        originalPrice: 119,
+        rating: 4.4,
+        reviews: 160,
+        image: "https://images.unsplash.com/photo-1560008581-09826d1de69e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=644&q=80",
+        category: ["veg", "ice-cream"],
+        topPick: false,
+        menuCategory: "drink"
+    },
+    {
+        id: 18,
+        title: "Chocolate Fudge Sundae",
+        description: "Vanilla ice cream topped with hot chocolate fudge, nuts and whipped cream.",
+        price: 129,
+        originalPrice: 149,
+        rating: 4.6,
+        reviews: 230,
+        image: "https://images.unsplash.com/photo-1488900128323-21503983a07e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80",
+        category: ["veg", "ice-cream"],
+        topPick: false,
+        menuCategory: "drink"
+    },
+
+    {
+        id: 21,
+        title: "Veg Manchurian",
+        description: "Deep-fried vegetable balls in a tangy, spicy Indo-Chinese sauce.",
+        price: 199,
+        originalPrice: 229,
+        rating: 4.5,
+        reviews: 350,
+        image: "https://tse1.mm.bing.net/th?id=OIP.es4WPD0-CFVsQLjHksjzhQHaF-&pid=Api&P=0&h=180",
+        category: ["veg"],
+        topPick: false,
+        menuCategory: "starters"
+    },
+    {
+        id: 22,
+        title: "Cashew Paneer",
+        description: "Paneer cubes cooked with cashews, creamy gravy, and mild spices.",
+        price: 249,
+        originalPrice: 279,
+        rating: 4.6,
+        reviews: 420,
+        image: "https://tse3.mm.bing.net/th?id=OIP.0chB1yrMsNj7j8ZMZUtuAAHaEK&pid=Api&P=0&h=180",
+        category: ["veg"],
+        topPick: false,
+        menuCategory: "starters"
+    },
+    {
+        id: 23,
+        title: "Crispy Corn",
+        description: "Crunchy fried corn kernels tossed in a spicy, tangy seasoning.",
+        price: 179,
+        originalPrice: 199,
+        rating: 4.4,
+        reviews: 300,
+        image: "https://tse4.mm.bing.net/th?id=OIP.g-u6lox6cPtLW0wx2wcRvAHaE7&pid=Api&P=0&h=180",
+        category: ["veg"],
+        topPick: false,
+        menuCategory: "starters"
+    },
+    {
+        id: 24,
+        title: "Veg Seekh Kabab",
+        description: "Minced vegetable skewers grilled to perfection with aromatic spices.",
+        price: 219,
+        originalPrice: 249,
+        rating: 4.6,
+        reviews: 380,
+        image: "https://tse1.mm.bing.net/th?id=OIP.UZtqH94oHotSty2bA1f8IAHaEK&pid=Api&P=0&h=180",
+        category: ["veg"],
+        topPick: false,
+        menuCategory: "starters"
+    },
+    {
+        id: 25,
+        title: "Kadai Vegetable Curry",
+        description: "Mixed vegetables cooked in a spicy kadai masala with tomatoes and bell peppers.",
+        price: 229,
+        originalPrice: 259,
+        rating: 4.5,
+        reviews: 400,
+        image: "https://tse1.mm.bing.net/th?id=OIP.LLhLxdQrfQ2ncWicM6tjEQHaEK&pid=Api&P=0&h=180",
+        category: ["veg"],
+        topPick: false,
+        menuCategory: "starters"
+    },
+    {
+        id: 26,
+        title: "Mutton Ghee Roast",
+        description: "Tender mutton roasted in ghee with a spicy, flavorful masala.",
+        price: 399,
+        originalPrice: 429,
+        rating: 4.8,
+        reviews: 450,
+        image: "https://tse1.mm.bing.net/th?id=OIP.-wTN8R_r5Ucl1Tkiz1LKxwAAAA&pid=Api&P=0&h=180",
+        category: ["non-veg"],
+        topPick: true,
+        menuCategory: "starters"
+    },
+    {
+        id: 27,
+        title: "Rayalaseema Biryani",
+        description: "Fragrant rice cooked with spices, meat, and Rayalaseema-style flavors.",
+        price: 349,
+        originalPrice: 379,
+        rating: 4.7,
+        reviews: 500,
+        image: "https://tse3.mm.bing.net/th?id=OIP.a0QdTkwztEm7reuIQLYHLQHaEE&pid=Api&P=0&h=180",
+        category: ["non-veg"],
+        topPick: false,
+        menuCategory: "biryani"
+    },
+    {
+        id: 28,
+        title: "Kaju Chicken Dry",
+        description: "Chicken cooked with cashews, dry spices, and a rich, nutty flavor.",
+        price: 299,
+        originalPrice: 329,
+        rating: 4.6,
+        reviews: 410,
+        image: "https://tse2.mm.bing.net/th?id=OIP.Catschr1jef5ciXbSNHlPwHaE8&pid=Api&P=0&h=180",
+        category: ["non-veg"],
+        topPick: false,
+        menuCategory: "starters"
+    },
+    {
+        id: 29,
+        title: "Chicken Shawarma",
+        description: "Grilled chicken wrapped in pita bread with garlic sauce and veggies.",
+        price: 259,
+        originalPrice: 289,
+        rating: 4.5,
+        reviews: 370,
+        image: "https://tse4.mm.bing.net/th?id=OIP.ETWaZrpkjtqRlbSFYqZgcQHaHa&pid=Api&P=0&h=180",
+        category: ["non-veg"],
+        topPick: false,
+        menuCategory: "starters"
+    },
+    {
+        id: 20,
+        title: "Fish Tikka",
+        description: "Marinated fish chunks grilled with spices, served with mint chutney.",
+        price: 279,
+        originalPrice: 309,
+        rating: 4.7,
+        reviews: 390,
+        image: "https://tse1.mm.bing.net/th?id=OIP.lvrHWuWHFR42Ohx6rfDv-gHaE8&pid=Api&P=0&h=180",
+        category: ["non-veg"],
+        topPick: false,
+        menuCategory: "starters"
+    },
+    {
+        id: 31,
+        title: "Chicken Soup",
+        description: "Warm, comforting soup made with chicken, herbs, and spices.",
+        price: 149,
+        originalPrice: 169,
+        rating: 4.4,
+        reviews: 320,
+        image: "https://tse2.mm.bing.net/th?id=OIP.RcO_sbGfqYStG-X5MZSqmwHaG9&pid=Api&P=0&h=180",
+        category: ["non-veg"],
+        topPick: true,
+        menuCategory: "starters"
+    },
+    {
+        id: 32,
+        title: "Egg Masala",
+        description: "Boiled eggs cooked in a spicy tomato and onion gravy.",
+        price: 189,
+        originalPrice: 209,
+        rating: 4.5,
+        reviews: 340,
+        image: "https://tse3.mm.bing.net/th?id=OIP.9ckAarS-_cZhhicmKotzOwHaJo&pid=Api&P=0&h=180",
+        category: ["non-veg"],
+        topPick: false,
+        menuCategory: "starters"
+    },
+    {
+        id: 33,
+        title: "Jumbo Prawns",
+        description: "Large prawns marinated and grilled with spicy seasonings.",
+        price: 399,
+        originalPrice: 429,
+        rating: 4.8,
+        reviews: 430,
+        image: "https://tse4.mm.bing.net/th?id=OIP.BF3R6dCoJzD1IMY2oxpAhQHaEK&pid=Api&P=0&h=180",
+        category: ["non-veg"],
+        topPick: false,
+        menuCategory: "starters"
+    },
+    {
+        id: 34,
+        title: "Double Ka Meetha with Ice Cream",
+        description: "Traditional bread pudding soaked in syrup, served with vanilla ice cream.",
+        price: 199,
+        originalPrice: 229,
+        rating: 4.6,
+        reviews: 360,
+        image: "https://tse2.mm.bing.net/th?id=OIP.wN9VTRTRIuhYY5WKiwsSKAAAAA&pid=Api&P=0&h=180",
+        category: ["veg", "dessert"],
+        topPick: false,
+        menuCategory: "dessert"
+    },
+    {
+        id: 35,
+        title: "Brownie with Ice Cream",
+        description: "Warm chocolate brownie topped with a scoop of vanilla ice cream.",
+        price: 219,
+        originalPrice: 249,
+        rating: 4.7,
+        reviews: 400,
+        image: "https://tse4.mm.bing.net/th?id=OIP.EE375WYmSR91k_wBmjI4ewHaHj&pid=Api&P=0&h=180",
+        category: ["veg", "dessert"],
+        topPick: false,
+        menuCategory: "dessert"
+    },
+    {
+        id: 36,
+        title: "Vanilla Ice Cream",
+        description: "Classic creamy vanilla ice cream.",
+        price: 129,
+        originalPrice: 149,
+        rating: 4.4,
+        reviews: 310,
+        image: "https://tse2.mm.bing.net/th?id=OIP.cS-vantzMfqxGxBAvrOgLgHaHa&pid=Api&P=0&h=180",
+        category: ["veg", "dessert"],
+        topPick: false,
+        menuCategory: "dessert"
+    },
+    {
+        id: 37,
+        title: "Chocolate Chip Ice Cream",
+        description: "Rich vanilla ice cream loaded with chocolate chips.",
+        price: 139,
+        originalPrice: 159,
+        rating: 4.5,
+        reviews: 330,
+        image: "https://tse4.mm.bing.net/th?id=OIP.3Uoroez-JGH1L0Wb6NN2owHaHa&pid=Api&P=0&h=180",
+        category: ["veg", "dessert"],
+        topPick: false,
+        menuCategory: "dessert"
+    },
+    {
+        id: 38,
+        title: "Butterscotch Ice Cream",
+        description: "Smooth ice cream with a sweet butterscotch flavor.",
+        price: 139,
+        originalPrice: 159,
+        rating: 4.5,
+        reviews: 320,
+        image: "https://tse1.mm.bing.net/th?id=OIP.sWVixjLa3sApdkikDuT2HgHaHa&pid=Api&P=0&h=180",
+        category: ["veg", "dessert"],
+        topPick: false,
+        menuCategory: "dessert"
+    },
+    {
+        id: 39,
+        title: "Mango Ice Cream",
+        description: "Refreshing ice cream made with ripe mango pulp.",
+        price: 139,
+        originalPrice: 159,
+        rating: 4.6,
+        reviews: 340,
+        image: "https://tse3.mm.bing.net/th?id=OIP.qmpsZ2R6BZG5R118sbEcEQHaJQ&pid=Api&P=0&h=180",
+        category: ["veg", "dessert"],
+        topPick: false,
+        menuCategory: "dessert"
+    },
+    {
+        id: 30,
+        title: "Chocolate Milkshake",
+        description: "Creamy milkshake made with chocolate syrup and ice cream.",
+        price: 149,
+        originalPrice: 169,
+        rating: 4.5,
+        reviews: 300,
+        image: "https://tse1.mm.bing.net/th?id=OIP.UNlYa25xiheIj1MIwBxxDwHaLG&pid=Api&P=0&h=180",
+        category: ["veg", "milkshake"],
+        topPick: true,
+        menuCategory: "drink"
+    },
+    {
+        id: 41,
+        title: "Strawberry Milkshake",
+        description: "Sweet and fruity milkshake made with fresh strawberries and milk.",
+        price: 149,
+        originalPrice: 169,
+        rating: 4.4,
+        reviews: 290,
+        image: "https://tse3.mm.bing.net/th?id=OIP.IdpYbh48bATxlx9Q_v0pjwHaLH&pid=Api&P=0&h=180",
+        category: ["veg", "milkshake"],
+        topPick: false,
+        menuCategory: "drink"
+    },
+    {
+        id: 44,
+        title: "Virgin Mojito",
+        description: "Refreshing mocktail with mint, lime, and soda.",
+        price: 129,
+        originalPrice: 149,
+        rating: 4.5,
+        reviews: 270,
+        image: "https://tse3.mm.bing.net/th?id=OIP.jjklzvs-YhdXiWeYUM5IIgHaIP&pid=Api&P=0&h=180",
+        category: ["veg", "milkshake"],
+        topPick: false,
+        menuCategory: "drink"
+    },
+    {
+        id: 45,
+        title: "Pineapple Punch",
+        description: "Sweet and tangy mocktail made with pineapple juice and citrus.",
+        price: 129,
+        originalPrice: 149,
+        rating: 4.4,
+        reviews: 260,
+        image: "https://tse1.mm.bing.net/th?id=OIP.mTyfoQXoiI5sg2511PETPwHaLH&pid=Api&P=0&h=180",
+        category: ["veg", "milkshake"],
+        topPick: true,
+        menuCategory: "drink"
+    },
+    {
+        id: 46,
+        title: "Blueberry Bliss",
+        description: "Fruity mocktail with blueberry syrup, lemonade, and a splash of soda.",
+        price: 139,
+        originalPrice: 159,
+        rating: 4.6,
+        reviews: 280,
+        image: "https://tse2.mm.bing.net/th?id=OIP.18R6gBXS6Un1AAIiEquo_wHaHa&pid=Api&P=0&h=180",
+        category: ["veg", "milkshake"],
+        topPick: false,
+        menuCategory: "drink"
+    },
+    {
+        id: 40,
+        title: "Watermelon Cooler",
+        description: "Refreshing mocktail made with fresh watermelon and mint.",
+        price: 129,
+        originalPrice: 149,
+        rating: 4.5,
+        reviews: 270,
+        image: "https://tse4.mm.bing.net/th?id=OIP.sfksJnIrURgoJbh0nGzMOQHaHa&pid=Api&P=0&h=180",
+        category: ["veg", "milkshake"],
+        topPick: false,
+        menuCategory: "drink"
+    }
+];
+
+        // DOM elements
+        const topPicksContainer = document.getElementById('topPicks');
+        const biryaniItemsContainer = document.getElementById('biryaniItems');
+        const curryItemsContainer = document.getElementById('curryItems');
+        const breadItemsContainer = document.getElementById('breadItems');
+        const dessertItemsContainer = document.getElementById('dessertItems');
+        const drinkItemsContainer = document.getElementById('drinkItems');
+        const cartIcon = document.getElementById('cartIcon');
+        const cartCount = document.getElementById('cartCount');
+        const cartModal = document.getElementById('cartModal');
+        const closeCart = document.getElementById('closeCart');
+        const cartItemsContainer = document.getElementById('cartItems');
+        const foodModal = document.getElementById('foodModal');
+        const closeModal = document.getElementById('closeModal');
+        const modalFoodImage = document.getElementById('modalFoodImage');
+        const modalFoodTitle = document.getElementById('modalFoodTitle');
+        const modalFoodRating = document.getElementById('modalFoodRating');
+        const modalFoodReviews = document.getElementById('modalFoodReviews');
+        const modalFoodPrice = document.getElementById('modalFoodPrice');
+        const modalFoodDescription = document.getElementById('modalFoodDescription');
+        const decreaseQuantity = document.getElementById('decreaseQuantity');
+        const increaseQuantity = document.getElementById('increaseQuantity');
+        const quantityValue = document.getElementById('quantityValue');
+        const modalAddToCart = document.getElementById('modalAddToCart');
+        const instructionsInput = document.getElementById('instructionsInput');
+        const buzzWords = document.querySelectorAll('.buzz-word');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const couponCodeInput = document.getElementById('couponCode');
+        const applyCouponBtn = document.getElementById('applyCoupon');
+        const couponMessage = document.getElementById('couponMessage');
+        const appliedCoupon = document.getElementById('appliedCoupon');
+        const appliedCouponCode = document.getElementById('appliedCouponCode');
+        const cancelCoupon = document.getElementById('cancelCoupon');
+        const subtotalElement = document.getElementById('subtotal');
+        const deliveryFeeElement = document.getElementById('deliveryFee');
+        const taxesElement = document.getElementById('taxes');
+        const discountRow = document.getElementById('discountRow');
+        const discountElement = document.getElementById('discount');
+        const totalElement = document.getElementById('total');
+        const offerCards = document.querySelectorAll('.offer-card');
+        const allCount = document.getElementById('all-count');
+        const vegCount = document.getElementById('veg-count');
+        const nonVegCount = document.getElementById('non-veg-count');
+        const dessertCount = document.getElementById('dessert-count');
+        const iceCreamCount = document.getElementById('ice-cream-count');
+        const milkshakeCount = document.getElementById('milkshake-count');
+
+        // State variables
+        let currentFoodItem = null;
+        let cart = [];
+        let currentQuantity = 1;
+        let currentInstructions = '';
+        let appliedCouponValue = null;
+        let discountPercentage = 0;
+
+        // Initialize the page
+        function init() {
+            renderMenuItems();
+            setupEventListeners();
+            updateFilterCounts();
+        }
+
+        // Render menu items
+        function renderMenuItems() {
+            // Clear containers
+            topPicksContainer.innerHTML = '';
+            biryaniItemsContainer.innerHTML = '';
+            curryItemsContainer.innerHTML = '';
+            breadItemsContainer.innerHTML = '';
+            dessertItemsContainer.innerHTML = '';
+            drinkItemsContainer.innerHTML = '';
+            
+            // Filter top picks
+            const topPicks = menuData.filter(item => item.topPick);
+            
+            // Render top picks with horizontal scrolling effect
+            topPicks.forEach(item => {
+                const card = createFoodCard(item);
+                card.classList.add('top-pick-card');
+                topPicksContainer.appendChild(card);
+            });
+            
+            // Render menu items by category
+            menuData.forEach(item => {
+                const card = createFoodCard(item);
+                
+                switch(item.menuCategory) {
+                    case 'biryani':
+                        biryaniItemsContainer.appendChild(card);
+                        break;
+                    case 'starters':
+                        curryItemsContainer.appendChild(card);
+                        break;
+                    case 'bread':
+                        breadItemsContainer.appendChild(card);
+                        break;
+                    case 'dessert':
+                        dessertItemsContainer.appendChild(card);
+                        break;
+                    case 'drink':
+                        drinkItemsContainer.appendChild(card);
+                        break;
+                }
+            });
+            
+            // Add click event to all food cards
+            document.querySelectorAll('.food-card, .top-pick-card').forEach(card => {
+                card.addEventListener('click', (e) => {
+                    if (!e.target.classList.contains('add-to-cart')) {
+                        const itemId = parseInt(card.dataset.id);
+                        const item = menuData.find(i => i.id === itemId);
+                        openFoodModal(item);
+                    }
+                });
+            });
+        }
+
+        // Update filter counts
+        function updateFilterCounts() {
+            const allItems = menuData.length;
+            const vegItems = menuData.filter(item => item.category.includes('veg')).length;
+            const nonVegItems = menuData.filter(item => item.category.includes('non-veg')).length;
+            const dessertItems = menuData.filter(item => item.category.includes('dessert')).length;
+            const iceCreamItems = menuData.filter(item => item.category.includes('ice-cream')).length;
+            const milkshakeItems = menuData.filter(item => item.category.includes('milkshake')).length;
+            
+            allCount.textContent = allItems;
+            vegCount.textContent = vegItems;
+            nonVegCount.textContent = nonVegItems;
+            dessertCount.textContent = dessertItems;
+            iceCreamCount.textContent = iceCreamItems;
+            milkshakeCount.textContent = milkshakeItems;
+        }
+
+        // Create food card element
+        function createFoodCard(item) {
+            const card = document.createElement('div');
+            card.className = 'food-card';
+            card.dataset.id = item.id;
+            card.dataset.category = item.category.join(' ');
+            
+            const priceHtml = item.originalPrice 
+                ? `<span class="original-price">₹${item.originalPrice}</span> ₹${item.price}`
+                : `₹${item.price}`;
+            
+            card.innerHTML = `
+                <img src="${item.image}" alt="${item.title}" class="food-image">
+                <div class="food-details">
+                    <h3 class="food-title">${item.title}</h3>
+                    <p class="food-description">${item.description}</p>
+                    <div class="food-footer">
+                        <div class="food-price">${priceHtml}</div>
+                        <div class="food-rating">
+                            <i class="fas fa-star"></i>
+                            <span>${item.rating}</span>
+                        </div>
+                    </div>
+                    <button class="add-to-cart">Add to Cart</button>
+                </div>
+            `;
+            
+            // Add click event to the Add to Cart button
+            const addToCartBtn = card.querySelector('.add-to-cart');
+            addToCartBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const itemId = parseInt(card.dataset.id);
+                const item = menuData.find(i => i.id === itemId);
+                addToCart(item, 1, '');
+            });
+            
+            return card;
+        }
+
+        // Open food modal
+        function openFoodModal(item) {
+            currentFoodItem = item;
+            currentQuantity = 1;
+            currentInstructions = '';
+            
+            modalFoodImage.src = item.image;
+            modalFoodTitle.textContent = item.title;
+            modalFoodRating.textContent = item.rating;
+            modalFoodReviews.textContent = `(${item.reviews}+ reviews)`;
+            
+            const priceHtml = item.originalPrice 
+                ? `<span class="original-price">₹${item.originalPrice}</span> ₹${item.price}`
+                : `₹${item.price}`;
+            modalFoodPrice.innerHTML = priceHtml;
+            
+            modalFoodDescription.textContent = item.description;
+            quantityValue.textContent = currentQuantity;
+            instructionsInput.value = '';
+            
+            foodModal.style.display = 'flex';
+        }
+
+        // Close food modal
+        function closeFoodModal() {
+            foodModal.style.display = 'none';
+        }
+
+        // Open cart modal
+        function openCartModal() {
+            renderCartItems();
+            updatePriceDetails();
+            cartModal.style.display = 'flex';
+        }
+
+        // Close cart modal
+        function closeCartModal() {
+            cartModal.style.display = 'none';
+        }
+
+        // Add to cart
+        function addToCart(item, quantity, instructions) {
+            const existingItem = cart.find(cartItem => cartItem.id === item.id && cartItem.instructions === instructions);
+            
+            if (existingItem) {
+                existingItem.quantity += quantity;
+            } else {
+                cart.push({
+                    id: item.id,
+                    title: item.title,
+                    price: item.price,
+                    image: item.image,
+                    quantity: quantity,
+                    instructions: instructions
+                });
+            }
+            
+            updateCartCount();
+            renderCartItems();
+            updatePriceDetails();
+            
+            // Show a quick confirmation (could be enhanced with a toast notification)
+            alert(`${quantity} ${item.title} added to cart!`);
+        }
+
+        // Update cart count
+        function updateCartCount() {
+            const count = cart.reduce((total, item) => total + item.quantity, 0);
+            cartCount.textContent = count;
+        }
+
+        // Render cart items
+        function renderCartItems() {
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = `
+                    <div class="empty-cart">
+                        <i class="fas fa-shopping-basket"></i>
+                        <p>No items added to cart</p>
+                        <p>Add some delicious food to get started!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            cartItemsContainer.innerHTML = '';
+            
+            cart.forEach((item, index) => {
+                const cartItemElement = document.createElement('div');
+                cartItemElement.className = 'cart-item';
+                
+                cartItemElement.innerHTML = `
+                    <img src="${item.image}" alt="${item.title}" class="cart-item-image">
+                    <div class="cart-item-details">
+                        <h4 class="cart-item-title">${item.title}</h4>
+                        <div class="cart-item-price">₹${item.price * item.quantity}</div>
+                        ${item.instructions ? `<p class="cart-item-instructions">${item.instructions}</p>` : ''}
+                        <div class="cart-item-quantity">
+                            <button class="cart-quantity-btn decrease-quantity" data-index="${index}">-</button>
+                            <span class="cart-quantity-value">${item.quantity}</span>
+                            <button class="cart-quantity-btn increase-quantity" data-index="${index}">+</button>
+                        </div>
+                        <span class="remove-item" data-index="${index}">Remove</span>
+                    </div>
+                `;
+                
+                cartItemsContainer.appendChild(cartItemElement);
+            });
+            
+            // Add event listeners to quantity buttons and remove buttons
+            document.querySelectorAll('.decrease-quantity').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = parseInt(e.target.dataset.index);
+                    updateCartItemQuantity(index, -1);
+                });
+            });
+            
+            document.querySelectorAll('.increase-quantity').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = parseInt(e.target.dataset.index);
+                    updateCartItemQuantity(index, 1);
+                });
+            });
+            
+            document.querySelectorAll('.remove-item').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = parseInt(e.target.dataset.index);
+                    removeCartItem(index);
+                });
+            });
+        }
+
+        // Update cart item quantity
+        function updateCartItemQuantity(index, change) {
+            const item = cart[index];
+            
+            if (change === -1 && item.quantity === 1) {
+                // Don't decrease below 1, instead remove the item
+                removeCartItem(index);
+                return;
+            }
+            
+            item.quantity += change;
+            
+            if (item.quantity < 1) {
+                cart.splice(index, 1);
+            }
+            
+            updateCartCount();
+            renderCartItems();
+            updatePriceDetails();
+        }
+
+        // Remove cart item
+        function removeCartItem(index) {
+            cart.splice(index, 1);
+            updateCartCount();
+            renderCartItems();
+            updatePriceDetails();
+        }
+
+        // Update price details
+        function updatePriceDetails() {
+            const subtotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+            const deliveryFee = subtotal >= 149 ? 0 : 40;
+            const taxes = subtotal * 0.05; // 5% tax
+            const discount = appliedCouponValue ? subtotal * (discountPercentage / 100) : 0;
+            const total = subtotal + deliveryFee + taxes - discount;
+            
+            subtotalElement.textContent = `₹${subtotal.toFixed(2)}`;
+            deliveryFeeElement.textContent = subtotal >= 149 ? 'FREE' : `₹${deliveryFee.toFixed(2)}`;
+            taxesElement.textContent = `₹${taxes.toFixed(2)}`;
+            
+            if (appliedCouponValue) {
+                discountRow.style.display = 'flex';
+                discountElement.textContent = `-₹${discount.toFixed(2)}`;
+            } else {
+                discountRow.style.display = 'none';
+            }
+            
+            totalElement.textContent = `₹${total.toFixed(2)}`;
+        }
+
+        // Apply coupon
+        function applyCoupon() {
+            const couponCode = couponCodeInput.value.trim();
+            
+            // Validate coupon format (23KB1A0... format)
+            const couponRegex = /^23KB1A0[A-Za-z0-9]{3}$/;
+            
+            if (!couponRegex.test(couponCode)) {
+                couponMessage.textContent = 'Invalid coupon code format. Please use format like 23KB1A0...';
+                couponMessage.className = 'coupon-message error';
+                return;
+            }
+            
+            // Generate a random discount between 10% and 30%
+            discountPercentage = Math.floor(Math.random() * 21) + 10; // 10-30%
+            
+            appliedCouponValue = couponCode;
+            appliedCouponCode.textContent = `${couponCode} (${discountPercentage}% off)`;
+            appliedCoupon.style.display = 'block';
+            
+            couponMessage.textContent = `Coupon applied! You got ${discountPercentage}% off.`;
+            couponMessage.className = 'coupon-message success';
+            couponCodeInput.value = '';
+            
+            updatePriceDetails();
+        }
+
+        // Cancel coupon
+        function cancelAppliedCoupon() {
+            appliedCouponValue = null;
+            discountPercentage = 0;
+            appliedCoupon.style.display = 'none';
+            couponMessage.textContent = 'Coupon removed.';
+            couponMessage.className = 'coupon-message';
+            
+            updatePriceDetails();
+        }
+
+        // Filter menu items
+        function filterMenuItems(filter) {
+            const menuCards = document.querySelectorAll('.food-card');
+            
+            menuCards.forEach(card => {
+                if (filter === 'all') {
+                    card.style.display = 'block';
+                } else {
+                    const categories = card.dataset.category.split(' ');
+                    if (categories.includes(filter)) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                }
+            });
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Cart icon click
+            cartIcon.addEventListener('click', openCartModal);
+            
+            // Close cart modal
+            closeCart.addEventListener('click', closeCartModal);
+            
+            // Close food modal
+            closeModal.addEventListener('click', closeFoodModal);
+            
+            // Quantity controls
+            decreaseQuantity.addEventListener('click', () => {
+                if (currentQuantity > 1) {
+                    currentQuantity--;
+                    quantityValue.textContent = currentQuantity;
+                }
+            });
+            
+            increaseQuantity.addEventListener('click', () => {
+                currentQuantity++;
+                quantityValue.textContent = currentQuantity;
+            });
+            
+            // Add to cart from modal
+            modalAddToCart.addEventListener('click', () => {
+                if (currentFoodItem) {
+                    addToCart(currentFoodItem, currentQuantity, currentInstructions);
+                    closeFoodModal();
+                }
+            });
+            
+            // Instructions input
+            instructionsInput.addEventListener('input', (e) => {
+                currentInstructions = e.target.value;
+            });
+            
+            // Buzz words
+            buzzWords.forEach(word => {
+                word.addEventListener('click', () => {
+                    if (currentInstructions) {
+                        currentInstructions += ', ' + word.textContent;
+                    } else {
+                        currentInstructions = word.textContent;
+                    }
+                    instructionsInput.value = currentInstructions;
+                });
+            });
+            
+            // Filter buttons
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    filterMenuItems(button.dataset.filter);
+                });
+            });
+            
+            // Apply coupon
+            applyCouponBtn.addEventListener('click', applyCoupon);
+            
+            // Cancel coupon
+            cancelCoupon.addEventListener('click', cancelAppliedCoupon);
+            
+            // Offer cards
+            offerCards.forEach(offer => {
+                offer.addEventListener('click', () => {
+                    const code = offer.dataset.code;
+                    couponCodeInput.value = code;
+                    applyCoupon();
+                });
+            });
+            
+            // Close modals when clicking outside
+            window.addEventListener('click', (e) => {
+                if (e.target === foodModal) {
+                    closeFoodModal();
+                }
+                if (e.target === cartModal) {
+                    closeCartModal();
+                }
+            });
+        }
+
+        // Initialize the app
+        init();
+    </script>
+</body>
+</html>
